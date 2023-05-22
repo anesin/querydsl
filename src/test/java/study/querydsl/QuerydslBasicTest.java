@@ -1,5 +1,7 @@
 package study.querydsl;
 
+import com.querydsl.core.NonUniqueResultException;
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import study.querydsl.entity.Team;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.*;
@@ -85,6 +89,32 @@ public class QuerydslBasicTest {
                                       member.age.eq(10))
                                .fetchOne();
     assertThat(findMember.getUsername()).isEqualTo("member1");
+  }
+
+
+  @Test
+  void resultFetch() {
+    List<Member> fetch = factory.selectFrom(member)
+                                .fetch();
+
+    try {
+      Member findMember1 = factory.selectFrom(member)
+                                  .fetchOne();
+    }
+    catch (NonUniqueResultException ignored) {}
+
+    Member findMember2 = factory.selectFrom(member)
+                                .fetchFirst();
+
+    // Deprecated: recommend use fetch() instead
+    QueryResults<Member> queryResults = factory.selectFrom(member)
+                                               .fetchResults();
+    long total = queryResults.getTotal();
+    List<Member> results = queryResults.getResults();
+
+    // Deprecated: recommend use the size of fetch() instead
+    long count = factory.selectFrom(member)
+                        .fetchCount();
   }
 
 }
