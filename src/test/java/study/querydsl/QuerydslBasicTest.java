@@ -227,4 +227,34 @@ public class QuerydslBasicTest {
         .containsExactly("teamA", "teamB");
   }
 
+
+  @Test
+  void join_on_filtering() {
+    List<Tuple> result = factory.select(member, team)
+                                .from(member)
+                                .leftJoin(member.team, team)
+                                .on(team.name.eq("teamA"))
+                                .fetch();
+
+    for (var tuple : result)
+      System.out.println("tuple = " + tuple);
+  }
+
+
+  @Test
+  void join_on_no_relation() {
+    em.persist(new Member("teamA"));
+    em.persist(new Member("teamB"));
+    em.persist(new Member("teamC"));
+
+    List<Tuple> result = factory.select(member, team)
+                                .from(member)
+                                .leftJoin(team)
+                                .on(member.username.eq(team.name))
+                                .fetch();
+
+    for (var tuple : result)
+      System.out.println("tuple = " + tuple);
+  }
+
 }
