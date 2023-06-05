@@ -4,6 +4,7 @@ import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -377,4 +378,22 @@ public class QuerydslBasicTest {
             .forEach(s -> System.out.println("s = " + s));
   }
 
+
+  @Test
+  void constant() {
+    factory.select(member.username, Expressions.constant("A"))
+           .from(member)
+           .fetch()
+           .forEach(t -> System.out.println("t = " + t));
+  }
+
+
+  @Test
+  void concat() {
+    factory.select(member.username.concat("_").concat(member.age.stringValue()))
+           .from(member)
+           .where(member.username.eq("member1"))
+           .fetch()
+           .forEach(s -> System.out.println("s = " + s));
+  }
 }
