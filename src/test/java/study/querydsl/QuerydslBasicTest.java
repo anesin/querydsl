@@ -5,7 +5,6 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -395,28 +394,6 @@ public class QuerydslBasicTest {
            .where(member.username.eq("member1"))
            .fetch()
            .forEach(s -> System.out.println("s = " + s));
-  }
-
-
-  @Test
-  void simpleProjection() {
-    factory.select(member.username)
-           .from(member)
-           .fetch()
-           .forEach(System.out::println);
-  }
-
-
-  @Test
-  void tupleProjection() {
-    List<Tuple> result = factory.select(member.username, member.age)
-                                .from(member)
-                                .fetch();
-    for (var tuple : result) {
-      String username = tuple.get(member.username);
-      Integer age = tuple.get(member.age);
-      System.out.println("username = " + username + ", age = " + age);
-    }
   }
 
 }
