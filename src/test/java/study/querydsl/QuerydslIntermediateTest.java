@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.QMemberDto;
 import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -127,6 +128,15 @@ public class QuerydslIntermediateTest {
   @Test
   void findDtoByConstructor() {
     factory.select(Projections.constructor(MemberDto.class, member.username, member.age))
+           .from(member)
+           .fetch()
+           .forEach(System.out::println);
+  }
+
+
+  @Test
+  void findDtoByQueryProjection() {
+    factory.select(new QMemberDto(member.username, member.age))
            .from(member)
            .fetch()
            .forEach(System.out::println);
