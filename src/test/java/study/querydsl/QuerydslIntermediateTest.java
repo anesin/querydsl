@@ -1,5 +1,6 @@
 package study.querydsl;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
@@ -20,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
 
 
@@ -140,6 +142,29 @@ public class QuerydslIntermediateTest {
            .from(member)
            .fetch()
            .forEach(System.out::println);
+  }
+
+
+  @Test
+  void dynamicQuery_BooleanBuilder() {
+    String usernameParam = "member1";
+    Integer ageParam = null;  // 10
+    
+    List<Member> result = searchMember1(usernameParam, ageParam);
+    assertThat(result.size()).isEqualTo(1);
+  }
+
+
+  private List<Member> searchMember1(String usernameCond, Integer ageCond) {
+    BooleanBuilder builder = new BooleanBuilder();
+    if (usernameCond != null)
+      builder.and(member.username.eq(usernameCond));
+    if (ageCond != null)
+      builder.and(member.age.eq(ageCond));
+
+    return factory.selectFrom(member)
+                  .where(builder)
+                  .fetch();
   }
 
 }
