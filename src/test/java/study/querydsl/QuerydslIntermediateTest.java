@@ -5,6 +5,8 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -243,6 +245,28 @@ public class QuerydslIntermediateTest {
     em.clear();
 
     factory.selectFrom(member)
+           .fetch()
+           .forEach(System.out::println);
+  }
+
+
+  @Test
+  void sqlFunction1() {
+    String template = "function('replace', {0}, {1}, {2})";
+    factory.select(Expressions.stringTemplate(template, member.username, "member", "M"))
+           .from(member)
+           .fetch()
+           .forEach(System.out::println);
+  }
+  
+  
+  @Test
+  void sqlFunction2() {
+    String template = "function('lower', {0})";
+    factory.select(member.username)
+           .from(member)
+//           .where(member.username.eq(Expressions.stringTemplate(template, member.username)))
+           .where(member.username.eq(member.username.lower()))
            .fetch()
            .forEach(System.out::println);
   }
