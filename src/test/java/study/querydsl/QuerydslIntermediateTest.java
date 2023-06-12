@@ -201,4 +201,50 @@ public class QuerydslIntermediateTest {
     return usernameEq(usernameCond).and(ageEq(ageCond));
   }
 
+
+  @Test
+  void bulkUpdate() {
+    factory.update(member)
+           .set(member.username, "비회원")
+           .where(member.age.lt(28))
+           .execute();
+
+    em.flush();
+    em.clear();
+
+    factory.selectFrom(member)
+           .fetch()
+           .forEach(System.out::println);
+  }
+
+
+  @Test
+  void bulkAdd() {
+    factory.update(member)
+           .set(member.age, member.age.add(1))
+           .execute();
+
+    em.flush();
+    em.clear();
+
+    factory.selectFrom(member)
+           .fetch()
+           .forEach(System.out::println);
+  }
+
+
+  @Test
+  void bulkDelete() {
+    factory.delete(member)
+           .where(member.age.gt(18))
+           .execute();
+
+    em.flush();
+    em.clear();
+
+    factory.selectFrom(member)
+           .fetch()
+           .forEach(System.out::println);
+  }
+
 }
