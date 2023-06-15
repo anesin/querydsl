@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static org.springframework.util.StringUtils.hasText;
 import static study.querydsl.entity.QMember.member;
 import static study.querydsl.entity.QTeam.team;
 
@@ -94,6 +95,50 @@ public class MemberJpaRepository {
                               Function<T, BooleanExpression> expression) {
     if (predicate.test(t))
       builder.and(expression.apply(t));
+  }
+
+
+  public List<MemberTeamDto> search(MemberSearchCondition condition) {
+    QMemberTeamDto qMemberTeamDto = new QMemberTeamDto(member.id, member.username, member.age, team.id, team.name);
+    return queryFactory.select(qMemberTeamDto)
+                       .from(member)
+                       .leftJoin(member.team, team)
+                       .where(usernameEq(condition.getUsername()),
+                              teamNameEq(condition.getTeamName()),
+                              ageGoe(condition.getAgeGoe()),
+                              ageLoe(condition.getAgeLoe()))
+                       .fetch();
+  }
+
+
+  public List<Member> searchMember(MemberSearchCondition condition) {
+    return queryFactory.selectFrom(member)
+                       .leftJoin(member.team, team)
+                       .where(usernameEq(condition.getUsername()),
+                              teamNameEq(condition.getTeamName()),
+                              ageGoe(condition.getAgeGoe()),
+                              ageLoe(condition.getAgeLoe()))
+                       .fetch();
+  }
+
+
+  private BooleanExpression usernameEq(String username) {
+    return hasText(username)? member.username.eq(username): null;
+  }
+
+
+  private BooleanExpression teamNameEq(String teamName) {
+    return hasText(teamName)? team.name.eq(teamName): null;
+  }
+
+
+  private BooleanExpression ageGoe(Integer ageGoe) {
+    return ageGoe == null? null: member.age.goe(ageGoe);
+  }
+
+
+  private BooleanExpression ageLoe(Integer ageLoe) {
+    return ageLoe == null? null:  member.age.loe(ageLoe);
   }
 
 }
