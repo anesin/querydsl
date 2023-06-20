@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.dto.QMemberTeamDto;
@@ -52,8 +53,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                                        .offset(pageable.getOffset())
                                        .limit(pageable.getPageSize())
                                        .fetch();
-    long total = searchCountQuery(condition).fetchCount();
-    return new PageImpl<>(contents, pageable, total);
+//    long total = countQuery(condition).fetchCount();
+//    return new PageImpl<>(contents, pageable, total);
+    return PageableExecutionUtils.getPage(contents, pageable, countQuery(condition)::fetchCount);
   }
 
 
@@ -69,7 +71,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
   }
 
 
-  private JPAQuery<Member> searchCountQuery(MemberSearchCondition condition) {
+  private JPAQuery<Member> countQuery(MemberSearchCondition condition) {
     return queryFactory.selectFrom(member)
                        .leftJoin(member.team, team)
                        .where(usernameEq(condition.getUsername()),
